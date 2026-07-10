@@ -18,8 +18,8 @@ export const dynamic = 'force-dynamic';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Ostris - AI Toolkit',
-  description: 'A toolkit for building AI things.',
+  title: 'Ostris - AI 工具箱',
+  description: '一个用于构建 AI 应用的工具箱。',
 };
 
 export const viewport = {
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const platform = os.platform();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="zh" suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-title" content="AI-Toolkit" />
         <script

@@ -131,10 +131,10 @@ export default function SampleImageViewer({
   const handleDelete = useCallback(() => {
     if (!imgPath) return;
     openConfirm({
-      title: 'Delete Sample',
-      message: `Are you sure you want to delete this sample? This action cannot be undone.`,
+      title: '删除采样图像',
+      message: `确定要删除此采样图像吗？此操作不可撤销。`,
       type: 'warning',
-      confirmText: 'Delete',
+      confirmText: '删除',
       onConfirm: () => {
         apiClient
           .post('/api/img/delete', { imgPath: imgPath })
@@ -362,7 +362,7 @@ export default function SampleImageViewer({
                 {sampleItem?.prompt && (
                   <div className="absolute inset-0 grid place-items-center overflow-auto mr-4">
                     <div className="w-full">
-                      <span className="text-gray-400 mr-1">Prompt:</span>
+                      <span className="text-gray-400 mr-1">提示词：</span>
                       <span className="whitespace-pre-wrap break-words">{sampleItem.prompt}</span>
                     </div>
                   </div>
@@ -396,13 +396,13 @@ export default function SampleImageViewer({
 
               <div className="text-xs">
                 <div>
-                  <span className="text-gray-400">Step:</span> {imgInfo.step.toLocaleString()}
+                  <span className="text-gray-400">步骤：</span> {imgInfo.step.toLocaleString()}
                 </div>
                 <div>
-                  <span className="text-gray-400">Sample #:</span> {imgInfo.promptIdx + 1}
+                  <span className="text-gray-400">采样编号：</span> {imgInfo.promptIdx + 1}
                 </div>
                 <div>
-                  <span className="text-gray-400">Seed:</span> {seed}
+                  <span className="text-gray-400">种子：</span> {seed}
                 </div>
               </div>
             </div>
@@ -411,7 +411,7 @@ export default function SampleImageViewer({
                 <button
                   type="button"
                   onClick={() => setShowBoxes(v => !v)}
-                  title={showBoxes ? 'Hide bounding boxes' : 'Show bounding boxes'}
+                  title={showBoxes ? '隐藏边界框' : '显示边界框'}
                   className={classNames('bg-gray-900 rounded-full p-1 leading-[0px] hover:opacity-100', {
                     'opacity-100 text-blue-400': showBoxes,
                     'opacity-50': !showBoxes,
@@ -436,13 +436,13 @@ export default function SampleImageViewer({
                           href={`/api/img/${encodeURIComponent(imgPath)}`}
                           download={imgPath.replace(/^.*[\\/]/, '')}
                         >
-                          Download
+                          下载
                         </a>
                       </MenuItem>
                     )}
                     <MenuItem>
                       <div className="cursor-pointer px-4 py-1 hover:bg-gray-800 rounded" onClick={handleDelete}>
-                        Delete Sample
+                        删除采样图像
                       </div>
                     </MenuItem>
                   </MenuItems>

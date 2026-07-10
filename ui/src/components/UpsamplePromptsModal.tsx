@@ -212,7 +212,7 @@ const UpsamplePromptsModal: React.FC = () => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Upsample Prompts"
+      title="上采样提示词 (Upsample)"
       size="lg"
       showCloseButton={!isRunning}
       closeOnOverlayClick={!isRunning}
@@ -221,30 +221,29 @@ const UpsamplePromptsModal: React.FC = () => {
         <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>
-            This loads a model and runs on the GPU. You need at least 13GB of free VRAM to run this, so make sure the
-            GPU is idle (no training or other jobs running) before starting, or it may run out of memory.
+            此功能需要加载模型并在 GPU 上运行，至少需要 13GB 的可用显存。请确保 GPU 处于空闲状态（没有训练或其他任务运行），否则可能会因显存不足而失败。
           </span>
         </div>
 
         <div className="mb-2 flex items-center justify-between text-sm">
           <div className="text-gray-400">
-            {isRunning && <span className="text-amber-400">Upsampling... please do not close this window.</span>}
-            {isDone && hasError && <span className="text-rose-400">Finished with errors. See log below.</span>}
-            {isDone && !hasError && <span className="text-emerald-400">Upsampling complete.</span>}
+            {isRunning && <span className="text-amber-400">正在上采样...请勿关闭此窗口。</span>}
+            {isDone && hasError && <span className="text-rose-400">完成但有错误，请查看下方日志。</span>}
+            {isDone && !hasError && <span className="text-emerald-400">上采样完成。</span>}
             {!isRunning && !isDone && (
               <span>
-                Select prompts to upsample into structured Ideogram captions. {selectedCount}/{prompts.length} selected.
+                选择要上采样为结构化 Ideogram 描述的提示词。已选择 {selectedCount}/{prompts.length} 个。
               </span>
             )}
           </div>
           {!isRunning && !isDone && (
             <div className="flex gap-2 flex-shrink-0">
               <button type="button" onClick={() => setAll(true)} className="text-xs text-gray-300 hover:text-gray-100">
-                Select all
+                全选
               </button>
               <span className="text-gray-600">|</span>
               <button type="button" onClick={() => setAll(false)} className="text-xs text-gray-300 hover:text-gray-100">
-                None
+                取消全选
               </button>
             </div>
           )}
@@ -263,23 +262,23 @@ const UpsamplePromptsModal: React.FC = () => {
               },
             )}
           >
-            Creative: {creative ? 'On' : 'Off'}
+            创意模式：{creative ? '开启' : '关闭'}
           </button>
           <span className="text-[11px] text-gray-500">
             {creative
-              ? 'Expands the idea — places the subject in a scene and adds fitting details.'
-              : 'Faithful — structures the prompt as given, with a minimal background.'}
+              ? '扩展创意 — 将主体放置在场景中并添加合适的细节。'
+              : '忠实还原 — 按原提示词结构化，背景最小化。'}
           </span>
         </div>
 
         <div className="mb-3">
-          <label className="block text-[11px] mb-1 text-gray-400">Additional instructions (optional)</label>
+          <label className="block text-[11px] mb-1 text-gray-400">附加指令（可选）</label>
           <textarea
             value={instructions}
             onChange={e => setInstructions(e.target.value)}
             disabled={isRunning || isDone}
             rows={2}
-            placeholder="e.g. keep it a close-up portrait, prefer a daytime setting, always include a 9:16 vertical framing..."
+            placeholder="例如：保持特写肖像，偏好日间场景，始终使用 9:16 竖向构图..."
             className="w-full text-xs px-2 py-1.5 bg-gray-950 border border-gray-700 rounded-md text-gray-100 placeholder-gray-600 focus:ring-1 focus:ring-gray-600 focus:outline-none resize-none disabled:opacity-50"
           />
         </div>
@@ -307,7 +306,7 @@ const UpsamplePromptsModal: React.FC = () => {
                     <span className="text-[10px] text-gray-500 flex-shrink-0">#{p.index + 1}</span>
                     <span className="text-[10px] text-gray-500 flex-shrink-0">{p.aspectRatio}</span>
                     {upsampled[p.index] && (
-                      <span className="text-[10px] text-emerald-400 flex-shrink-0">upsampled</span>
+                      <span className="text-[10px] text-emerald-400 flex-shrink-0">已上采样</span>
                     )}
                   </div>
                   <div
@@ -341,7 +340,7 @@ const UpsamplePromptsModal: React.FC = () => {
             disabled={isRunning}
             className="px-4 py-2 text-sm text-gray-300 hover:text-gray-100 disabled:opacity-40 disabled:cursor-not-allowed rounded-md"
           >
-            {isDone ? 'Close' : 'Cancel'}
+            {isDone ? '关闭' : '取消'}
           </button>
           {!isDone && (
             <button
@@ -350,7 +349,7 @@ const UpsamplePromptsModal: React.FC = () => {
               disabled={isRunning || selectedCount === 0}
               className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-md"
             >
-              {isRunning ? 'Upsampling...' : `Upsample (${selectedCount})`}
+              {isRunning ? '上采样中...' : `上采样 (${selectedCount})`}
             </button>
           )}
         </div>
