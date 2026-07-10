@@ -35,11 +35,11 @@ const Sidebar = () => {
   }, [isMobileOpen]);
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'New Job', href: '/jobs/new', icon: Plus },
-    { name: 'Queue', href: '/jobs', icon: BrainCircuit },
-    { name: 'Datasets', href: '/datasets', icon: Images },
-    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: '仪表盘', href: '/dashboard', icon: Home },
+    { name: '新建任务', href: '/jobs/new', icon: Plus },
+    { name: '任务队列', href: '/jobs', icon: BrainCircuit },
+    { name: '数据集', href: '/datasets', icon: Images },
+    { name: '设置', href: '/settings', icon: Settings },
   ];
 
   const socialsBoxClass =
@@ -98,7 +98,7 @@ const Sidebar = () => {
             fill="#c0392b"
           />
         </svg>
-        <span className="uppercase text-sm font-medium tracking-wide">Support AI-Toolkit</span>
+        <span className="uppercase text-sm font-medium tracking-wide">支持 AI-Toolkit</span>
       </a>
 
       {/* Social links grid */}
