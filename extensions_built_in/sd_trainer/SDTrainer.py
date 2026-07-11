@@ -1361,7 +1361,8 @@ class SDTrainer(BaseSDTrainProcess):
                     ) < self.train_config.match_adapter_chance
 
             self.timer.stop('preprocess_batch')
-            self._update_step_progress("编码 latent")
+            if self.progress_bar is not None and total_batches > 1:
+                self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "编码数据")
 
             is_reg = False
             loss_multiplier = torch.ones((noisy_latents.shape[0], 1, 1, 1), device=self.device_torch, dtype=dtype)
