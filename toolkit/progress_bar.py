@@ -14,7 +14,8 @@ class ToolkitProgressBar(tqdm):
         super().__init__(*args, **kwargs)
         self.paused = False
         self.last_time = self._time()
-        self.batch_bar = None  # 嵌套的批次进度条
+        self.dataset_size = 0  # 数据集总图片数
+        self.current_image = 0  # 当前处理的图片序号
 
     def pause(self):
         if not self.paused:
@@ -32,17 +33,20 @@ class ToolkitProgressBar(tqdm):
         if not self.paused:
             super().update(*args, **kwargs)
 
-    def set_batch_progress(self, batch_num: int, total_batches: int, phase: str = ""):
-        """设置批次进度"""
-        if total_batches <= 1:
-            return
-        percent = (batch_num / total_batches) * 100
-        bar_str = make_bar(percent, 15)
-        postfix = f"批次 {batch_num}/{total_batches} {bar_str}"
-        if phase:
-            postfix += f" {phase}"
-        self.set_postfix_str(postfix)
+    def set_dataset_info(self, dataset_size: int):
+        """设置数据集大小"""
+        self.dataset_size = dataset_size
 
-    def clear_batch_progress(self):
-        """清除批次进度显示"""
+    def set_image_progress(self, image_idx: int, phase: str = ""):
+        """设置当前图片进度"""
+        if self.dataset_size > 0:
+            percent = (image_idx / self.dataset_size) * 100
+            bar_str = make_bar(percent, 15)
+            postfix = f"图片 {image_idx}/{self.dataset_size} {bar_str}"
+            if phase:
+                postfix += f" {phase}"
+            self.set_postfix_str(postfix)
+
+    def clear_image_progress(self):
+        """清除图片进度显示"""
         self.set_postfix_str("")

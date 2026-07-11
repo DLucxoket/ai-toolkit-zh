@@ -1287,8 +1287,12 @@ class SDTrainer(BaseSDTrainProcess):
 
     def train_single_accumulation(self, batch: DataLoaderBatchDTO, batch_idx: int = 0, total_batches: int = 1):
         with torch.no_grad():
-            if self.progress_bar is not None and total_batches > 1:
-                self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "加载数据")
+            # 更新图片进度
+            if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
+                # 从 step_num 和 batch_idx 计算当前图片位置
+                grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
+                current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
+                self.progress_bar.set_image_progress(current_image, "加载数据")
             self.timer.start('preprocess_batch')
             if isinstance(self.adapter, CustomAdapter):
                 batch = self.adapter.edit_batch_raw(batch)
@@ -1361,8 +1365,11 @@ class SDTrainer(BaseSDTrainProcess):
                     ) < self.train_config.match_adapter_chance
 
             self.timer.stop('preprocess_batch')
-            if self.progress_bar is not None and total_batches > 1:
-                self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "编码数据")
+            # 更新图片进度 - 编码阶段
+            if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
+                grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
+                current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
+                self.progress_bar.set_image_progress(current_image, "编码数据")
 
             is_reg = False
             loss_multiplier = torch.ones((noisy_latents.shape[0], 1, 1, 1), device=self.device_torch, dtype=dtype)
@@ -1961,8 +1968,11 @@ class SDTrainer(BaseSDTrainProcess):
                     ]
 
                 self.before_unet_predict()
-                if self.progress_bar is not None and total_batches > 1:
-                    self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "前向传播")
+                # 更新图片进度 - 前向传播
+                if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
+                    grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
+                    current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
+                    self.progress_bar.set_image_progress(current_image, "前向传播")
 
                 if unconditional_embeds is not None:
                     unconditional_embeds = unconditional_embeds.to(self.device_torch, dtype=dtype).detach()
@@ -2101,8 +2111,11 @@ class SDTrainer(BaseSDTrainProcess):
                     print_acc("loss is nan")
                     loss = torch.zeros_like(loss).requires_grad_(True)
 
-                if self.progress_bar is not None and total_batches > 1:
-                    self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "反向传播")
+                # 更新图片进度 - 反向传播
+                if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
+                    grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
+                    current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
+                    self.progress_bar.set_image_progress(current_image, "反向传播")
                 with self.timer('backward'):
                     # todo we have multiplier seperated. works for now as res are not in same batch, but need to change
                     loss = loss * loss_multiplier.mean()
@@ -2150,9 +2163,9 @@ class SDTrainer(BaseSDTrainProcess):
             if len(batch_list) > 1 and self.model_config.low_vram:
                 torch.cuda.empty_cache()
 
-        # 清除批次进度显示
-        if self.progress_bar is not None and total_batches > 1:
-            self.progress_bar.clear_batch_progress()
+        # 清除图片进度显示
+        if self.progress_bar is not None:
+            self.progress_bar.clear_image_progress()
 
 
         if not self.is_grad_accumulation_step:
