@@ -1285,8 +1285,14 @@ class SDTrainer(BaseSDTrainProcess):
         )
     
 
+    def _update_step_progress(self, phase: str):
+        """Update progress bar with current training phase."""
+        if self.progress_bar is not None and hasattr(self, 'step_num'):
+            self.progress_bar.set_postfix_str(f"[{phase}]")
+
     def train_single_accumulation(self, batch: DataLoaderBatchDTO):
         with torch.no_grad():
+            self._update_step_progress("加载 batch")
             self.timer.start('preprocess_batch')
             if isinstance(self.adapter, CustomAdapter):
                 batch = self.adapter.edit_batch_raw(batch)
@@ -1359,6 +1365,7 @@ class SDTrainer(BaseSDTrainProcess):
                     ) < self.train_config.match_adapter_chance
 
             self.timer.stop('preprocess_batch')
+            self._update_step_progress("编码 latent")
 
             is_reg = False
             loss_multiplier = torch.ones((noisy_latents.shape[0], 1, 1, 1), device=self.device_torch, dtype=dtype)
@@ -1957,7 +1964,8 @@ class SDTrainer(BaseSDTrainProcess):
                     ]
 
                 self.before_unet_predict()
-                
+                self._update_step_progress("前向传播")
+
                 if unconditional_embeds is not None:
                     unconditional_embeds = unconditional_embeds.to(self.device_torch, dtype=dtype).detach()
                 with self.timer('condition_noisy_latents'):
@@ -2095,6 +2103,7 @@ class SDTrainer(BaseSDTrainProcess):
                     print_acc("loss is nan")
                     loss = torch.zeros_like(loss).requires_grad_(True)
 
+                self._update_step_progress("反向传播")
                 with self.timer('backward'):
                     # todo we have multiplier seperated. works for now as res are not in same batch, but need to change
                     loss = loss * loss_multiplier.mean()

@@ -2359,6 +2359,7 @@ class BaseSDTrainProcess(BaseTrainProcess):
             if self.train_config.free_u:
                 self.sd.pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.1, b2=1.2)
             if self.progress_bar is not None:
+                self.progress_bar.set_postfix_str("[训练中...]")
                 self.progress_bar.unpause()
             with torch.no_grad():
                 # if is even step and we have a reg dataset, use that
@@ -2516,6 +2517,7 @@ class BaseSDTrainProcess(BaseTrainProcess):
                         self.accelerator
                         # print above the progress bar
                         if self.progress_bar is not None:
+                            self.progress_bar.set_postfix_str("[保存权重...]")
                             self.progress_bar.pause()
                         print_acc(f"\nSaving at step {self.step_num}")
                         self.save(self.step_num)
@@ -2529,6 +2531,7 @@ class BaseSDTrainProcess(BaseTrainProcess):
                             
                     if is_sample_step:
                         if self.progress_bar is not None:
+                            self.progress_bar.set_postfix_str("[生成预览...]")
                             self.progress_bar.pause()
                         flush()
                         # print above the progress bar
