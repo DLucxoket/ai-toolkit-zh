@@ -132,14 +132,14 @@ def _load_mmdit_state_dict(name_or_path: str, filename: Optional[str]) -> dict:
     file ``filename`` is downloaded, defaulting to ``model.safetensors``).
     """
     if name_or_path.endswith(".safetensors") and os.path.isfile(name_or_path):
-        return load_file(name_or_path)
+        return load_file(name_or_path, backend="pread")
 
     if os.path.isdir(name_or_path):
         if filename is not None:
-            return load_file(os.path.join(name_or_path, filename))
+            return load_file(os.path.join(name_or_path, filename), backend="pread")
         candidates = [f for f in os.listdir(name_or_path) if f.endswith(".safetensors")]
         if len(candidates) == 1:
-            return load_file(os.path.join(name_or_path, candidates[0]))
+            return load_file(os.path.join(name_or_path, candidates[0]), backend="pread")
         raise FileNotFoundError(
             f"Could not pick an MMDiT checkpoint in {name_or_path}: found "
             f"{candidates}. Set model.model_kwargs.checkpoint_filename."
@@ -160,7 +160,7 @@ def _load_mmdit_state_dict(name_or_path: str, filename: Optional[str]) -> dict:
             f"Could not find {fname!r} in hub repo {name_or_path!r}. Set "
             "model.model_kwargs.checkpoint_filename to the weight file name."
         ) from e
-    return load_file(path)
+    return load_file(path, backend="pread")
 
 
 class Krea2Model(BaseModel):
@@ -323,7 +323,7 @@ class Krea2Model(BaseModel):
                     f"Failed to download assistant LoRA from {lora_path}: {e}"
                 )
         # load the adapter and merge it in. We will inference with a -1.0 multiplier so the adapter effects only work during training.
-        lora_state_dict = load_file(lora_path)
+        lora_state_dict = load_file(lora_path, backend="pread")
         # detect the LoRA rank from the first down-projection weight.
         dim_key = next(k for k in lora_state_dict if k.endswith("lora_A.weight"))
         dim = int(lora_state_dict[dim_key].shape[0])
