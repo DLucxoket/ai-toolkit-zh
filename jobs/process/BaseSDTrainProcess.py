@@ -2371,8 +2371,11 @@ class BaseSDTrainProcess(BaseTrainProcess):
                     is_sample_step = False
 
                 batch_list = []
+                grad_accum_total = self.train_config.gradient_accumulation
 
-                for b in range(self.train_config.gradient_accumulation):
+                for b in range(grad_accum_total):
+                    if self.progress_bar is not None and grad_accum_total > 1:
+                        self.progress_bar.set_batch_progress(b + 1, grad_accum_total, "加载数据")
                     # keep track to alternate on an accumulation step for reg   
                     batch_step = step
                     # don't do a reg step on sample or save steps as we dont want to normalize on those

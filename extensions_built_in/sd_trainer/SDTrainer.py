@@ -1285,14 +1285,10 @@ class SDTrainer(BaseSDTrainProcess):
         )
     
 
-    def _update_step_progress(self, phase: str):
-        """Update progress bar with current training phase."""
-        if self.progress_bar is not None and hasattr(self, 'step_num'):
-            self.progress_bar.set_postfix_str(f"[{phase}]")
-
-    def train_single_accumulation(self, batch: DataLoaderBatchDTO):
+    def train_single_accumulation(self, batch: DataLoaderBatchDTO, batch_idx: int = 0, total_batches: int = 1):
         with torch.no_grad():
-            self._update_step_progress("加载 batch")
+            if self.progress_bar is not None and total_batches > 1:
+                self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "加载数据")
             self.timer.start('preprocess_batch')
             if isinstance(self.adapter, CustomAdapter):
                 batch = self.adapter.edit_batch_raw(batch)
@@ -1964,7 +1960,8 @@ class SDTrainer(BaseSDTrainProcess):
                     ]
 
                 self.before_unet_predict()
-                self._update_step_progress("前向传播")
+                if self.progress_bar is not None and total_batches > 1:
+                    self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "前向传播")
 
                 if unconditional_embeds is not None:
                     unconditional_embeds = unconditional_embeds.to(self.device_torch, dtype=dtype).detach()
@@ -2103,7 +2100,8 @@ class SDTrainer(BaseSDTrainProcess):
                     print_acc("loss is nan")
                     loss = torch.zeros_like(loss).requires_grad_(True)
 
-                self._update_step_progress("反向传播")
+                if self.progress_bar is not None and total_batches > 1:
+                    self.progress_bar.set_batch_progress(batch_idx + 1, total_batches, "反向传播")
                 with self.timer('backward'):
                     # todo we have multiplier seperated. works for now as res are not in same batch, but need to change
                     loss = loss * loss_multiplier.mean()
@@ -2128,7 +2126,8 @@ class SDTrainer(BaseSDTrainProcess):
             batch_list = [batch]
         total_loss = None
         self.optimizer.zero_grad()
-        for batch in batch_list:
+        total_batches = len(batch_list)
+        for i, batch in enumerate(batch_list):
             if self.sd.is_multistage:
                 # handle multistage switching
                 if self.steps_this_boundary >= self.train_config.switch_boundary_every or self.current_boundary_index not in self.sd.trainable_multistage_boundaries:
@@ -2141,7 +2140,7 @@ class SDTrainer(BaseSDTrainProcess):
                         if self.current_boundary_index in self.sd.trainable_multistage_boundaries:
                             # if this boundary is trainable, we can stop looking
                             break
-            loss = self.train_single_accumulation(batch)
+            loss = self.train_single_accumulation(batch, batch_idx=i, total_batches=total_batches)
             self.steps_this_boundary += 1
             if total_loss is None:
                 total_loss = loss
@@ -2149,6 +2148,10 @@ class SDTrainer(BaseSDTrainProcess):
                 total_loss += loss
             if len(batch_list) > 1 and self.model_config.low_vram:
                 torch.cuda.empty_cache()
+
+        # 清除批次进度显示
+        if self.progress_bar is not None and total_batches > 1:
+            self.progress_bar.clear_batch_progress()
 
 
         if not self.is_grad_accumulation_step:
