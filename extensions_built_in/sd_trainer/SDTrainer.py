@@ -1292,7 +1292,7 @@ class SDTrainer(BaseSDTrainProcess):
                 # 从 step_num 和 batch_idx 计算当前图片位置
                 grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
                 current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
-                self.progress_bar.set_image_progress(current_image, "加载数据")
+                self.progress_bar.set_image_progress(current_image, "loading")
             self.timer.start('preprocess_batch')
             if isinstance(self.adapter, CustomAdapter):
                 batch = self.adapter.edit_batch_raw(batch)
@@ -1369,7 +1369,7 @@ class SDTrainer(BaseSDTrainProcess):
             if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
                 grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
                 current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
-                self.progress_bar.set_image_progress(current_image, "编码数据")
+                self.progress_bar.set_image_progress(current_image, "encoding")
 
             is_reg = False
             loss_multiplier = torch.ones((noisy_latents.shape[0], 1, 1, 1), device=self.device_torch, dtype=dtype)
@@ -1972,7 +1972,7 @@ class SDTrainer(BaseSDTrainProcess):
                 if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
                     grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
                     current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
-                    self.progress_bar.set_image_progress(current_image, "前向传播")
+                    self.progress_bar.set_image_progress(current_image, "forward")
 
                 if unconditional_embeds is not None:
                     unconditional_embeds = unconditional_embeds.to(self.device_torch, dtype=dtype).detach()
@@ -2115,7 +2115,7 @@ class SDTrainer(BaseSDTrainProcess):
                 if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
                     grad_accum = self.train_config.gradient_accumulation if hasattr(self.train_config, 'gradient_accumulation') else 1
                     current_image = (self.step_num * grad_accum + batch_idx) % self.progress_bar.dataset_size + 1
-                    self.progress_bar.set_image_progress(current_image, "反向传播")
+                    self.progress_bar.set_image_progress(current_image, "backward")
                 with self.timer('backward'):
                     # todo we have multiplier seperated. works for now as res are not in same batch, but need to change
                     loss = loss * loss_multiplier.mean()

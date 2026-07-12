@@ -2363,7 +2363,7 @@ class BaseSDTrainProcess(BaseTrainProcess):
             if self.train_config.free_u:
                 self.sd.pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.1, b2=1.2)
             if self.progress_bar is not None:
-                self.progress_bar.set_postfix_str("[训练中...]")
+                self.progress_bar.set_postfix_str("[training...]")
                 self.progress_bar.unpause()
             with torch.no_grad():
                 # if is even step and we have a reg dataset, use that
@@ -2382,7 +2382,7 @@ class BaseSDTrainProcess(BaseTrainProcess):
                     if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
                         # 当前图片序号 = (步数 * 梯度累积 + 批次序号) % 数据集大小
                         current_image = (step * grad_accum_total + b) % self.progress_bar.dataset_size + 1
-                        self.progress_bar.set_image_progress(current_image, "加载数据")
+                        self.progress_bar.set_image_progress(current_image, "loading")
                     # keep track to alternate on an accumulation step for reg   
                     batch_step = step
                     # don't do a reg step on sample or save steps as we dont want to normalize on those
@@ -2527,7 +2527,7 @@ class BaseSDTrainProcess(BaseTrainProcess):
                         self.accelerator
                         # print above the progress bar
                         if self.progress_bar is not None:
-                            self.progress_bar.set_postfix_str("[保存权重...]")
+                            self.progress_bar.set_postfix_str("[saving...]")
                             self.progress_bar.pause()
                         print_acc(f"\nSaving at step {self.step_num}")
                         self.save(self.step_num)
@@ -2541,7 +2541,7 @@ class BaseSDTrainProcess(BaseTrainProcess):
                             
                     if is_sample_step:
                         if self.progress_bar is not None:
-                            self.progress_bar.set_postfix_str("[生成预览...]")
+                            self.progress_bar.set_postfix_str("[sampling...]")
                             self.progress_bar.pause()
                         flush()
                         # print above the progress bar
