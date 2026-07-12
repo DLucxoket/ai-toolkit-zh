@@ -2512,6 +2512,8 @@ class BaseSDTrainProcess(BaseTrainProcess):
 
                     if self.progress_bar is not None:
                         self.progress_bar.set_postfix_str(prog_bar_string)
+                        # 保存最后一次的 loss 信息，采样时也能显示
+                        self._last_loss_str = prog_bar_string
 
                 # if the batch is a DataLoaderBatchDTO, then we need to clean it up
                 if isinstance(batch, DataLoaderBatchDTO):
@@ -2527,7 +2529,9 @@ class BaseSDTrainProcess(BaseTrainProcess):
                         self.accelerator
                         # print above the progress bar
                         if self.progress_bar is not None:
-                            self.progress_bar.set_postfix_str("[saving...]")
+                            loss_info = getattr(self, '_last_loss_str', '')
+                            saving_msg = f"[saving...] {loss_info}"
+                            self.progress_bar.set_postfix_str(saving_msg)
                             self.progress_bar.pause()
                         print_acc(f"\nSaving at step {self.step_num}")
                         self.save(self.step_num)
@@ -2541,7 +2545,9 @@ class BaseSDTrainProcess(BaseTrainProcess):
                             
                     if is_sample_step:
                         if self.progress_bar is not None:
-                            self.progress_bar.set_postfix_str("[sampling...]")
+                            loss_info = getattr(self, '_last_loss_str', '')
+                            sampling_msg = f"[sampling...] {loss_info}"
+                            self.progress_bar.set_postfix_str(sampling_msg)
                             self.progress_bar.pause()
                         flush()
                         # print above the progress bar
