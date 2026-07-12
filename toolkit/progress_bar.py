@@ -42,7 +42,7 @@ class ToolkitProgressBar(tqdm):
         if self.dataset_size > 0:
             percent = (image_idx / self.dataset_size) * 100
             bar_str = make_bar(percent, 15)
-            postfix = f"图片 {image_idx}/{self.dataset_size} {bar_str}"
+            postfix = f"img {image_idx}/{self.dataset_size} {bar_str}"
             if phase:
                 postfix += f" {phase}"
             self.set_postfix_str(postfix)
