@@ -16,6 +16,7 @@ class ToolkitProgressBar(tqdm):
         self.last_time = self._time()
         self.dataset_size = 0  # 数据集总图片数
         self.current_image = 0  # 当前处理的图片序号
+        self.last_loss_str = ""  # 上次的 loss 信息
 
     def pause(self):
         if not self.paused:
@@ -45,6 +46,9 @@ class ToolkitProgressBar(tqdm):
             postfix = f"img {image_idx}/{self.dataset_size} {bar_str}"
             if phase:
                 postfix += f" {phase}"
+            # 显示上次的 loss 信息
+            if self.last_loss_str:
+                postfix += f" | {self.last_loss_str}"
             self.set_postfix_str(postfix)
 
     def clear_image_progress(self):
