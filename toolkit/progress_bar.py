@@ -5,7 +5,7 @@ import time
 def make_bar(percent: float, width: int = 20) -> str:
     """生成一个迷你进度条字符串"""
     filled = int(width * percent / 100)
-    bar = '█' * filled + '░' * (width - filled)
+    bar = '#' * filled + '-' * (width - filled)
     return f'[{bar}] {percent:.0f}%'
 
 
