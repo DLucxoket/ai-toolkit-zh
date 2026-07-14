@@ -17,6 +17,7 @@ class ToolkitProgressBar(tqdm):
         self.dataset_size = 0  # 数据集总图片数
         self.current_image = 0  # 当前处理的图片序号
         self.last_loss_str = ""  # 上次的 loss 信息
+        self.step_num = 0  # 当前步数
 
     def pause(self):
         if not self.paused:
@@ -39,13 +40,18 @@ class ToolkitProgressBar(tqdm):
         self.dataset_size = dataset_size
 
     def set_image_progress(self, image_idx: int, total_in_step: int, phase: str = ""):
-        """设置当前图片进度 (当前step内的第几张)"""
+        """设置当前图片进度 (当前step内的第几张 + 总进度)"""
         if total_in_step > 0:
             percent = (image_idx / total_in_step) * 100
-            bar_str = make_bar(percent, 15)
+            bar_str = make_bar(percent, 10)
             postfix = f"img {image_idx}/{total_in_step} {bar_str}"
+            # 显示总进度
+            if self.dataset_size > 0:
+                global_idx = (self.step_num * total_in_step + image_idx - 1) % self.dataset_size + 1
+                total_percent = (global_idx / self.dataset_size) * 100
+                postfix += f" | total {global_idx}/{self.dataset_size} ({total_percent:.0f}%)"
             if phase:
-                postfix += f" {phase}"
+                postfix += f" | {phase}"
             if self.last_loss_str:
                 postfix += f" | {self.last_loss_str}"
             self.set_postfix_str(postfix)

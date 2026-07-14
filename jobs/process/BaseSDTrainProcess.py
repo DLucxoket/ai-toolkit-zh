@@ -2358,6 +2358,9 @@ class BaseSDTrainProcess(BaseTrainProcess):
                 self.train_config.do_cfg = True
                 self.train_config.cfg_scale = value_map(random.random(), 0, 1, 1.0, self.train_config.max_cfg_scale)
             self.step_num = step
+            # 更新进度条的 step_num
+            if self.progress_bar is not None:
+                self.progress_bar.step_num = step
             # default to true so various things can turn it off
             self.is_grad_accumulation_step = True
             if self.train_config.free_u:
