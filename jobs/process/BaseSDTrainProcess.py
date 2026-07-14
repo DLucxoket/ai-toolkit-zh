@@ -2379,10 +2379,8 @@ class BaseSDTrainProcess(BaseTrainProcess):
 
                 for b in range(grad_accum_total):
                     # 计算当前图片在数据集中的位置
-                    if self.progress_bar is not None and self.progress_bar.dataset_size > 0:
-                        # 当前图片序号 = (步数 * 梯度累积 + 批次序号) % 数据集大小
-                        current_image = (step * grad_accum_total + b) % self.progress_bar.dataset_size + 1
-                        self.progress_bar.set_image_progress(current_image, "loading")
+                    if self.progress_bar is not None and grad_accum_total > 1:
+                        self.progress_bar.set_image_progress(b + 1, grad_accum_total, "loading")
                     # keep track to alternate on an accumulation step for reg   
                     batch_step = step
                     # don't do a reg step on sample or save steps as we dont want to normalize on those

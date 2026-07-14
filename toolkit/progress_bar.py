@@ -38,15 +38,14 @@ class ToolkitProgressBar(tqdm):
         """设置数据集大小"""
         self.dataset_size = dataset_size
 
-    def set_image_progress(self, image_idx: int, phase: str = ""):
-        """设置当前图片进度"""
-        if self.dataset_size > 0:
-            percent = (image_idx / self.dataset_size) * 100
+    def set_image_progress(self, image_idx: int, total_in_step: int, phase: str = ""):
+        """设置当前图片进度 (当前step内的第几张)"""
+        if total_in_step > 0:
+            percent = (image_idx / total_in_step) * 100
             bar_str = make_bar(percent, 15)
-            postfix = f"img {image_idx}/{self.dataset_size} {bar_str}"
+            postfix = f"img {image_idx}/{total_in_step} {bar_str}"
             if phase:
                 postfix += f" {phase}"
-            # 显示上次的 loss 信息
             if self.last_loss_str:
                 postfix += f" | {self.last_loss_str}"
             self.set_postfix_str(postfix)
