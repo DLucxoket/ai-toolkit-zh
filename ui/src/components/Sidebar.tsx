@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Settings, BrainCircuit, Images, Plus, X } from 'lucide-react';
+import { Home, Settings, BrainCircuit, Images, Plus, X, Sparkles } from 'lucide-react';
 import { FaXTwitter, FaDiscord, FaYoutube } from 'react-icons/fa6';
 import { createGlobalState } from 'react-global-hooks';
 import ThemeToggle from './ThemeToggle';
@@ -36,6 +36,7 @@ const Sidebar = () => {
 
   const navigation = [
     { name: '仪表盘', href: '/dashboard', icon: Home },
+    { name: '生成', href: '/generate', icon: Sparkles, badge: 'alpha' },
     { name: '新建任务', href: '/jobs/new', icon: Plus },
     { name: '任务队列', href: '/jobs', icon: BrainCircuit },
     { name: '数据集', href: '/datasets', icon: Images },
@@ -73,6 +74,11 @@ const Sidebar = () => {
               >
                 <item.icon className="w-5 h-5 mr-3" />
                 {item.name}
+                {'badge' in item && item.badge && (
+                  <span className="ml-2 px-1.5 py-0.5 text-[10px] leading-none uppercase tracking-wide rounded bg-blue-600/20 text-blue-400 border border-blue-500/40">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             </li>
           ))}

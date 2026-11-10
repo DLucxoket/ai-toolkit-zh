@@ -124,6 +124,9 @@ celerybeat.pid
 .venv
 .python
 .node
+.ffmpeg
+.mingit
+.uv
 env/
 venv/
 ENV/
@@ -182,7 +185,16 @@ cython_debug/
 .DS_Store
 ._.DS_Store
 aitk_db.db
+aitk_db.db-wal
+aitk_db.db-shm
 /notes.md
 /data
 .claude
 .mimocode/
+
+original_repo
+.next
+testing/.model_test_outputs
+testing/.engine_test_outputs
+testing/.*
+/issue_review
